@@ -163,7 +163,11 @@
 
 <span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.e2e_asr_transformer</span> <span class="kn">import</span> <span class="n">subsequent_mask</span>
 <span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.e2e_tts_tacotron2</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Tacotron2Loss</span> <span class="k">as</span> <span class="n">TransformerLoss</span><span class="p">,</span>  <span class="c1"># noqa: H301</span>
+    <span class="n">Tacotron2Loss</span> <span class="k">as</span> <span class="n">TransformerLoss</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.e2e_tts_transformer</span> <span class="kn">import</span> <span class="n">TTSPlot</span>  <span class="c1"># noqa: H301</span>
+<span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.e2e_tts_transformer</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa: H301</span>
+    <span class="n">GuidedMultiHeadAttentionLoss</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.nets_utils</span> <span class="kn">import</span> <span class="n">make_non_pad_mask</span>
 <span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.tacotron2.decoder</span> <span class="kn">import</span> <span class="n">Postnet</span>
@@ -171,17 +175,15 @@
 <span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.tacotron2.encoder</span> <span class="kn">import</span> <span class="n">Encoder</span> <span class="k">as</span> <span class="n">EncoderPrenet</span>
 <span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.transformer.attention</span> <span class="kn">import</span> <span class="n">MultiHeadedAttention</span>
 <span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.transformer.decoder</span> <span class="kn">import</span> <span class="n">Decoder</span>
-<span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.transformer.embedding</span> <span class="kn">import</span> <span class="n">PositionalEncoding</span>
-<span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.transformer.embedding</span> <span class="kn">import</span> <span class="n">ScaledPositionalEncoding</span>
+<span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.transformer.embedding</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PositionalEncoding</span><span class="p">,</span>
+    <span class="n">ScaledPositionalEncoding</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.transformer.encoder</span> <span class="kn">import</span> <span class="n">Encoder</span>
 <span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.transformer.initializer</span> <span class="kn">import</span> <span class="n">initialize</span>
 <span class="kn">from</span> <span class="nn">espnet.nets.tts_interface</span> <span class="kn">import</span> <span class="n">TTSInterface</span>
 <span class="kn">from</span> <span class="nn">espnet.utils.cli_utils</span> <span class="kn">import</span> <span class="n">strtobool</span>
 <span class="kn">from</span> <span class="nn">espnet.utils.fill_missing_args</span> <span class="kn">import</span> <span class="n">fill_missing_args</span>
-<span class="kn">from</span> <span class="nn">espnet.nets.pytorch_backend.e2e_tts_transformer</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">GuidedMultiHeadAttentionLoss</span><span class="p">,</span>  <span class="c1"># noqa: H301</span>
-    <span class="n">TTSPlot</span><span class="p">,</span>  <span class="c1"># noqa: H301</span>
-<span class="p">)</span>
 
 
 <div class="viewcode-block" id="Transformer"><a class="viewcode-back" href="../../../../_gen/espnet.nets.html#espnet.nets.pytorch_backend.e2e_vc_transformer.Transformer">[docs]</a><span class="k">class</span> <span class="nc">Transformer</span><span class="p">(</span><span class="n">TTSInterface</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
@@ -826,7 +828,7 @@
             <span class="n">xs_ds</span><span class="p">,</span> <span class="n">ilens_ds</span> <span class="o">=</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ilens</span>
 
         <span class="c1"># forward encoder</span>
-        <span class="n">x_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_mask</span><span class="p">(</span><span class="n">ilens_ds</span><span class="p">)</span>
+        <span class="n">x_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_mask</span><span class="p">(</span><span class="n">ilens_ds</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">xs</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">hs</span><span class="p">,</span> <span class="n">hs_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">xs_ds</span><span class="p">,</span> <span class="n">x_masks</span><span class="p">)</span>
 
         <span class="c1"># integrate speaker embedding</span>
@@ -854,7 +856,7 @@
             <span class="n">ilens_ds_st</span> <span class="o">=</span> <span class="n">ilens_ds</span>
 
         <span class="c1"># forward decoder</span>
-        <span class="n">y_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_mask</span><span class="p">(</span><span class="n">olens_in</span><span class="p">)</span>
+        <span class="n">y_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_mask</span><span class="p">(</span><span class="n">olens_in</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">xs</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">zs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">ys_in</span><span class="p">,</span> <span class="n">y_masks</span><span class="p">,</span> <span class="n">hs_int</span><span class="p">,</span> <span class="n">hs_masks</span><span class="p">)</span>
         <span class="c1"># (B, Lmax//r, odim * r) -&gt; (B, Lmax//r * r, odim)</span>
         <span class="n">before_outs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feat_out</span><span class="p">(</span><span class="n">zs</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">zs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">odim</span><span class="p">)</span>
@@ -1130,7 +1132,7 @@
                 <span class="n">xs_ds</span><span class="p">,</span> <span class="n">ilens_ds</span> <span class="o">=</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ilens</span>
 
             <span class="c1"># forward encoder</span>
-            <span class="n">x_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_mask</span><span class="p">(</span><span class="n">ilens_ds</span><span class="p">)</span>
+            <span class="n">x_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_mask</span><span class="p">(</span><span class="n">ilens_ds</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">xs</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
             <span class="n">hs</span><span class="p">,</span> <span class="n">hs_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">xs_ds</span><span class="p">,</span> <span class="n">x_masks</span><span class="p">)</span>
 
             <span class="c1"># integrate speaker embedding</span>
@@ -1149,7 +1151,7 @@
             <span class="n">ys_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_first_frame_and_remove_last_frame</span><span class="p">(</span><span class="n">ys_in</span><span class="p">)</span>
 
             <span class="c1"># forward decoder</span>
-            <span class="n">y_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_mask</span><span class="p">(</span><span class="n">olens_in</span><span class="p">)</span>
+            <span class="n">y_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_mask</span><span class="p">(</span><span class="n">olens_in</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">xs</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
             <span class="n">zs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">ys_in</span><span class="p">,</span> <span class="n">y_masks</span><span class="p">,</span> <span class="n">hs</span><span class="p">,</span> <span class="n">hs_masks</span><span class="p">)</span>
 
             <span class="c1"># calculate final outputs</span>
@@ -1252,7 +1254,7 @@
 <span class="sd">                    [[1, 1, 1, 0, 0]]], dtype=torch.uint8)</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">x_masks</span> <span class="o">=</span> <span class="n">make_non_pad_mask</span><span class="p">(</span><span class="n">ilens</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">x_masks</span> <span class="o">=</span> <span class="n">make_non_pad_mask</span><span class="p">(</span><span class="n">ilens</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">x_masks</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_target_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">olens</span><span class="p">):</span>
@@ -1281,7 +1283,7 @@
 <span class="sd">                     [1, 1, 1, 0, 0]]], dtype=torch.uint8)</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">y_masks</span> <span class="o">=</span> <span class="n">make_non_pad_mask</span><span class="p">(</span><span class="n">olens</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">y_masks</span> <span class="o">=</span> <span class="n">make_non_pad_mask</span><span class="p">(</span><span class="n">olens</span><span class="p">)</span>
         <span class="n">s_masks</span> <span class="o">=</span> <span class="n">subsequent_mask</span><span class="p">(</span><span class="n">y_masks</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">y_masks</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">y_masks</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">s_masks</span>
 
